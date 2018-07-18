@@ -1,0 +1,8 @@
+%   FT Parser
+% ===================
+% reads in raw FT data and outputs to mat file
+%% Clear old data
+clc 
+clear all
+%% Settings
+fn = "F1_R30P0T0

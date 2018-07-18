@@ -1,0 +1,22 @@
+%   FT Parser
+% ===================
+% reads in raw FT data and outputs to mat file
+%% Clear old data
+clc 
+clear all
+%% Settings
+day = 09;
+month = 07;
+year = 2018;
+timezoneshift = -7;
+fn = "F1_R30P0T0_Test0.txt";
+%% Get Parsed Data
+[t_f1,ws,wd] = parseFT205(fn,day,month,year,timezoneshift);
+[t,ws,wd] = parseFT205(fn,day,month,year,timezoneshift);
+%% plot
+subplot 211
+plot(t,ws,'r');
+subplot 212 
+plot(t,wd,'b');
+plot(t,'o')
+% t(1:35)
