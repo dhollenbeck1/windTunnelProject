@@ -8,8 +8,8 @@ ss = dv(:,4)*3600 + dv(:,5)*60 + dv(:,6);
 sod = datetime(year,month,day,'Timezone','UTC');
 ts = sod + seconds(ss) + hours(timezoneshift);
 t = UTC2epoch(string(ts));
-wind_speed = str2num(dat(:,40:44));
-wind_dir = str2num(dat(:,46:48));
+wind_speed = str2num(dat(:,45:49));
+wind_dir = str2num(dat(:,39:41));
 
 % fix time
 k = find(diff(t)==1)+1;
