@@ -25,6 +25,7 @@
 %   $Revision: 1.0 $  $Date: 2017/05/16 08:37:00 $
 function [y, dv] = epoch2UTC(epoch)
 dnum = datenum(1970,1,1,0,0,epoch);
+% dnum = datenum(2018,11,12,0,0,epoch);
 dv = datevec(dnum); % date vector as [Y, M, D, H, MN, S]
 y = datestr(719529 + epoch/86400,'dd-mmm-yyyy HH:MM:SS');
 return
