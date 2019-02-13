@@ -1,12 +1,47 @@
 %% Batch script
-% parses all of the test files and outputs to mat file
-%% Clear data
+% by Derek Hollenbeck
+% updated: 2.1.19
+
+% algorithm
+%-----------------------------------
+% Take in calibration data set first
+% load in files one by one from control sensor then onboard sensor
+% store in one matrix (as grided raw data)
+% repeat for test data
+
+% structure
+%-----------------------------------
+% ref = calibration  or reference data (no throttle)
+% ref.name = directory name
+% ref.size = size of matrix (2 x 2)
+% ref.data = [wind speed, wind dir] (sampleSize x 2)
+% ref.p    = pitch value
+% ref.r    = roll value
+% ref(P,R) = ref structure for each (Pitch,Roll) combination
+% same structure applies to test.data (with throttle)
+
+% sensors
+%------------------------------------
+% F1 - FT205 placed in wind tunel for LCWT experiment
+% F3 - FT742 places on-board sUAS for LCWT experiment
+
+% Clear data
 clc
 clear
-%% Add the paths
-addpath C:/Users/drkfr/Desktop/Wind/WindTestF1F3_Sum18/F1_Test0_NoThrottle/
-addpath C:/Users/drkfr/Desktop/Wind/WindTestF1F3_Sum18/F3_Test0_NoThrottle/
+% Add the paths
+% addpath C:/Users/drkfr/Desktop/Wind/WindTestF1F3_Sum18/F1_Test0_NoThrottle/
+% addpath C:/Users/drkfr/Desktop/Wind/WindTestF1F3_Sum18/F3_Test0_NoThrottle/
+s0 = 'C:/Users/drkfr/Desktop/Wind/Data';
+addpath(s0)
+
+% Desired Folder
+s1 = ['TOf Data';'TOn Data'];
+s2 = ['F1';'F3'];
+fpath = [s0,'/',s1(1,:),'/',s2(1,:)]; % set path
+[d,numfiles,numdir] = getfpathinfo(fpath);
+ref = [];
 %% Load each file
+
 % roll = R
 % pitch = P
 % roll values {10,20,30}
@@ -20,7 +55,7 @@ sampleStart = 200;
 sampleSize = 2400;
 
 % test parameters
-R = linspace(0,30,4);
+R = [0,10,20,30];
 P = [30,20,10,0,-10,-20,-30];
 
 s11 = 'F1_';
@@ -31,7 +66,7 @@ s5 = '_Test0.txt';
 % initialize matrix for storing data
 um = zeros(length(R),length(P),sampleSize);
 uc = um;
-vm = um; 
+vm = um;
 vc = um;
 
 for i=1:length(R)
@@ -39,17 +74,17 @@ for i=1:length(R)
     figure
     for j=1:length(P)
         % missing data
-%         if i == 1
-%            if j ~= 4
-%               continue
-%            end
-%         end
-%         
-%         if i~= 1
-%             if j == 4
-%                 continue
-%             end
-%         end
+        %         if i == 1
+        %            if j ~= 4
+        %               continue
+        %            end
+        %         end
+        %
+        %         if i~= 1
+        %             if j == 4
+        %                 continue
+        %             end
+        %         end
         
         if j == 2 && i == 3         % R20 P20
             continue
@@ -82,7 +117,7 @@ for i=1:length(R)
         
         % save
         uc(i,j,:) = u1;
-        vc(i,j,:) = v1;     
+        vc(i,j,:) = v1;
         u_avg_f1(i,j) = mean(u1);
         v_avg_f1(i,j) = mean(v1);
         ws_avg_f1(i,j) = sqrt( u_avg_f1(i,j)^2 + v_avg_f1(i,j)^2 );
@@ -133,21 +168,21 @@ for i=1:length(R)
         % plot data
         %        subplot(6,3,(i-1)*length(P) + j)
         subplot(4,2,j)
-%         plot(t1,u1,'b',t1,v1,'b--'); 
-%         plot(t2,u2,'g',t2,v2,'g--'); 
+        %         plot(t1,u1,'b',t1,v1,'b--');
+        %         plot(t2,u2,'g',t2,v2,'g--');
         yyaxis left
         plot(t1,sqrt(u1.^2+v1.^2),'r--');hold on;
-        plot(t2,sqrt(u2.^2+v2.^2),'r'); hold off; 
+        plot(t2,sqrt(u2.^2+v2.^2),'r'); hold off;
         ylim([0,5])
         ylabel('m/s');
         
         yyaxis right
         plot(t1,atan2d(v1,u1),'k--'); hold on
         plot(t2,atan2d(v2,u2),'k'); hold off
-%         ylim([-5,5])
+        %         ylim([-5,5])
         ylabel('deg');
         
-        xlabel('Time');  
+        xlabel('Time');
         title(['P = ',num2str(P(j)),', R = ',num2str(R(i))]);
         
         % clear data
@@ -163,3 +198,11 @@ save FT_test0 u_avg_f1 u_avg_f3 v_avg_f1 ...
     wd_avg_f3 err_ws_avg err_wd_avg...
     P R ws_cf wd_cf um uc vm vc wm kval
 
+%% FUNCTIONS
+
+function [d,numfiles,numdir] = getfpathinfo(fpath)
+% get num of files / dir
+d = dir(fpath);
+numfiles = sum(not([d.isdir]));
+numdir = sum([d.isdir]);
+end
